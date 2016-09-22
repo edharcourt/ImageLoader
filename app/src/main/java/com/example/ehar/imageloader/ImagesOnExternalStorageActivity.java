@@ -36,7 +36,7 @@ import java.util.ArrayList;
  *
  *     https://developer.android.com/training/displaying-bitmaps/cache-bitmap.html
  *
- * Displaying Bitmaps in UI ising backgroun thread, ViewPager, cache, ...
+ * Displaying Bitmaps in UI using background thread, ViewPager, cache, ...
  *
  *     https://developer.android.com/training/displaying-bitmaps/display-bitmap.html
  *
