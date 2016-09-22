@@ -72,7 +72,6 @@ public class MainFragment extends Fragment {
 
         Resources r = getResources();
 
-
         // set up the click listeners for each image
         for (int i = 0; i < 4; i++) {
             int id = r.getIdentifier("i"+i,"id",getActivity().getPackageName());
