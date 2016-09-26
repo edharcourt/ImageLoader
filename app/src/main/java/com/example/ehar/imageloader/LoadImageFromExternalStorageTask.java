@@ -11,16 +11,22 @@ import android.widget.ImageView;
 
 public class LoadImageFromExternalStorageTask extends AsyncTask<String, Void, Bitmap> {
 
-    ImageView v = null;
+    // Void is the type of publishProgress and onProgressUpdate methods.
+    // Often an Integer as Percenrtage but Void if not implemented.
 
-    public LoadImageFromExternalStorageTask(ImageView v) {
-         this.v = v;
+    ImageView v = null;  // Should we make this a WeakReference?
+    int w, h;
+
+    public LoadImageFromExternalStorageTask(ImageView v, int w, int h) {
+        this.v = v;
+        this.w = w;
+        this.h = h;
     }
 
     @Override
     protected Bitmap doInBackground(String... paths) {
         //return BitmapFactory.decodeFile(paths[0]);
-        return Utility.decodeSampledBitmapFromPath(paths[0], 120, 120);
+        return Utility.decodeSampledBitmap(paths[0], w, h);
     }
 
     @Override

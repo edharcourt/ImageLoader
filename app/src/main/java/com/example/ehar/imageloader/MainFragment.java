@@ -32,10 +32,7 @@ public class MainFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    public MainFragment() {
-        // Required empty public constructor
-    }
+    public MainFragment() { }
 
     /**
      * Use this factory method to create a new instance of

@@ -47,8 +47,9 @@ public class Utility {
         return inSampleSize;
     }
 
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
+    public static Bitmap decodeSampledBitmap(
+            Resources res, int resId,
+            int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         // This does not load the image, just fills in dimensions.
@@ -65,7 +66,7 @@ public class Utility {
     }
 
 
-    public static Bitmap decodeSampledBitmapFromPath(
+    public static Bitmap decodeSampledBitmap(
             String path,
             int reqWidth, int reqHeight) {
 
