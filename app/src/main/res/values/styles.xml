@@ -11,11 +11,10 @@
 
 
     <style name="image_style">
-        <item name="android:background">#DDDDDD</item>
         <item name="android:padding">2dp</item>
         <item name="android:layout_width">120dp</item>
         <item name="android:layout_height">120dp</item>
-        <item name="android:scaleType">fitXY</item>
+        <item name="android:scaleType">centerCrop</item>
     </style>
 
 </resources>

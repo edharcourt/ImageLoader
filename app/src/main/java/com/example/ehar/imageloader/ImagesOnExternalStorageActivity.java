@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -70,7 +72,7 @@ public class ImagesOnExternalStorageActivity extends Activity {
 
 
         if (sd_card_read_permission)
-            init();
+            init2();
 
         return;
     }
@@ -93,7 +95,7 @@ public class ImagesOnExternalStorageActivity extends Activity {
 
         if (requestCode == EXT_STORAGE_READ_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                init();
+                init2();
                 sd_card_read_permission = true;
                 return;
             }
@@ -122,13 +124,60 @@ public class ImagesOnExternalStorageActivity extends Activity {
             final int id = r.getIdentifier("i" + (i+4), "id", getPackageName());
             final ImageButton ib = (ImageButton) findViewById(id);
             final int tmp_i = i;
+            int red = (int) (Math.random()*256);
+            int green = (int) (Math.random()*256);
+            int blue = (int) (Math.random()*256);
+            int c = 0xFF000000 | (red << 16) | (green << 8) | (blue);
+            ib.setBackgroundColor(c);
             ib.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // should we check that it might already be loaded?
-                    Bitmap bm1 = decodeSampledBitmapFromResource(r,id,120,120);
-                    Bitmap bm = BitmapFactory.decodeFile(pics.get(tmp_i));
-                    ib.setImageBitmap(bm);
+                    // Bitmap bm1 = decodeSampledBitmapFromResource(r,id,120,120);
+                    new Thread(new Runnable() {
+                        public void run() {
+
+                            final Bitmap bm = BitmapFactory.decodeFile(pics.get(tmp_i));
+
+                            // Why do we have to do this? Because we're not on the UI thread.
+                            ib.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ib.setImageBitmap(bm);
+                                }
+                            });
+                        }
+                    }).start();
+                }
+            });
+        }
+    }
+
+    /**
+     * precondition: sd_card_read_permission
+     */
+    protected void init2() {
+
+        if (!sd_card_read_permission) return;
+
+        getFiles();
+
+        final Resources r = getResources();
+
+        // set up the click listeners for each image
+        for (int i = 0; i < pics.size(); i++) {
+            final int id = r.getIdentifier("i" + (i+4), "id", getPackageName());
+            final ImageButton ib = (ImageButton) findViewById(id);
+            final int tmp_i = i;
+            int red = (int) (Math.random()*256);
+            int green = (int) (Math.random()*256);
+            int blue = (int) (Math.random()*256);
+            int c = 0xFF000000 | (red << 16) | (green << 8) | (blue);
+            ib.setBackgroundColor(c);
+            ib.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new LoadImageFromExternalStorageTask(ib).execute(pics.get(tmp_i));
                 }
             });
         }
@@ -214,4 +263,5 @@ public class ImagesOnExternalStorageActivity extends Activity {
         }
         return false;
     }
+
 }
