@@ -3,8 +3,11 @@ package com.example.ehar.imageloader;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 /**
  * Created by ehar on 9/26/16.
@@ -74,6 +77,7 @@ public class Utility {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
+
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
@@ -82,4 +86,29 @@ public class Utility {
         return BitmapFactory.decodeFile(path, options);
     }
 
-}
+    /**
+     * Get a list of file names we are going to load in.
+     *
+     * precond: must have read permission on external storage.
+     */
+    public static ArrayList<String> getFiles() {
+
+        ArrayList<String> pics = new ArrayList<>();
+
+        // Read doc on this function. Lots of bad stuff can happen.
+        // might not be mounted orreadable if it is.
+        //File sdCardRoot = Environment.getExternalStorageDirectory();
+        //File pictures = new File(sdCardRoot, "Pictures");
+        File pictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String sdPath = pictures.getPath() + '/';
+
+        for (File f : pictures.listFiles()) {
+            if (f.isFile())
+                pics.add(sdPath + f.getName());
+        }
+
+        return pics;
+    }
+
+
+} // Utility
