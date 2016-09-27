@@ -49,7 +49,6 @@ import java.util.ArrayList;
 
 public class ImagesOnExternalStorageActivity extends Activity {
 
-    ArrayList<String> pics = null;
     public static final int EXT_STORAGE_READ_REQUEST = 999;
 
     boolean sd_card_read_permission = false;
@@ -67,12 +66,16 @@ public class ImagesOnExternalStorageActivity extends Activity {
         // default is ARGB_565
         // https://developer.android.com/reference/android/graphics/Bitmap.Config.html
         bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        sd_card_read_permission = false;
 
         handle_permissions();
 
-
         if (sd_card_read_permission)
             init2();
+        else {
+            // Toast
+            // go back to previous activity
+        }
 
         return;
     }
@@ -115,7 +118,7 @@ public class ImagesOnExternalStorageActivity extends Activity {
 
         if (!sd_card_read_permission) return;
 
-        getFiles();
+        final ArrayList<String> pics = Utility.getFiles();
 
         final Resources r = getResources();
 
@@ -127,7 +130,7 @@ public class ImagesOnExternalStorageActivity extends Activity {
             int red = (int) (Math.random()*256);
             int green = (int) (Math.random()*256);
             int blue = (int) (Math.random()*256);
-            int c = 0xFF000000 | (red << 16) | (green << 8) | (blue);
+            int c = 0xFF000000 | (red << 16) | (green << 8) | blue;
             ib.setBackgroundColor(c);
             ib.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -160,7 +163,7 @@ public class ImagesOnExternalStorageActivity extends Activity {
 
         if (!sd_card_read_permission) return;
 
-        getFiles();
+        final ArrayList<String> pics = Utility.getFiles();
 
         final Resources r = getResources();
 
@@ -183,29 +186,6 @@ public class ImagesOnExternalStorageActivity extends Activity {
         }
     }
 
-
-    /**
-     * Get a list of file names we are going to load in.
-     */
-    protected void getFiles() {
-
-        pics = new ArrayList<>();
-
-        File sdCardRoot = Environment.getExternalStorageDirectory();
-        File pictures = new File(sdCardRoot, "Pictures");
-        sdPath = pictures.getPath() + '/';
-
-        //boolean r = pictures.canRead();
-        //boolean d = pictures.isDirectory();
-        //boolean er = isExternalStorageReadable();
-
-        for (File f : pictures.listFiles()) {
-            if (f.isFile())
-                pics.add(sdPath + f.getName());
-        }
-
-        return;
-    }
 
 
     /* Checks if external storage is available to at least read */
