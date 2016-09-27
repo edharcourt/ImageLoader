@@ -2,6 +2,7 @@ package com.example.ehar.imageloader;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -181,6 +183,19 @@ public class ImagesOnExternalStorageActivity extends Activity {
                 }
             });
         }
+
+        Button next_button = (Button) findViewById(R.id.next);
+        next_button.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(
+                        ImagesOnExternalStorageActivity.this,
+                        LoadImagesFromNetwork.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 

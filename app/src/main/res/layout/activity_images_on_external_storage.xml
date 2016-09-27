@@ -13,7 +13,8 @@
 
     <GridLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/main_image">
 
         <ImageButton
             android:id="@+id/i4"
@@ -44,6 +45,15 @@
             />
 
     </GridLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/next"
+        android:layout_below="@id/main_image"
+        android:text="@string/next"
+        />
+
 
 
 </RelativeLayout>
