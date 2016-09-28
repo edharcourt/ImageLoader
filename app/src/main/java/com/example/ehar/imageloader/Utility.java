@@ -4,9 +4,14 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -86,6 +91,19 @@ public class Utility {
         return BitmapFactory.decodeFile(path, options);
     }
 
+    public static Bitmap decodeSampledBitmap(
+            InputStream is,
+            BitmapFactory.Options options,
+            int reqWidth, int reqHeight) {
+
+        // Calculate new inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeStream(is, null, options);
+    }
+
     /**
      * Get a list of file names we are going to load in.
      *
@@ -108,6 +126,103 @@ public class Utility {
         }
 
         return pics;
+    }
+
+
+    /**
+     * http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
+     * Modified to use HttpUrlConnection instead og AndroidHttpClient
+     * @param urls
+     * @return
+     */
+    static Bitmap downloadBitmap(String urls) {
+
+        // Get the dimentions of the the URL image
+        BitmapFactory.Options options = downloadBitmapOptions(urls);
+
+        if (options == null)
+            return null;
+
+        //final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+        //final HttpGet getRequest = new HttpGet(url);
+        URL url = null;
+        HttpURLConnection connection = null;
+
+        try {
+            url = new URL(urls);
+            connection = (HttpURLConnection) url.openConnection();
+            int z = connection.getResponseCode();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                Log.w("ImageDownloader", "Error while retrieving bitmap: " + connection.getResponseMessage());
+                return null;
+            }
+            InputStream inputStream = null;
+            try {
+                inputStream = new BufferedInputStream(connection.getInputStream());
+                //final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                final Bitmap bitmap = Utility.decodeSampledBitmap(inputStream, options, 120, 120);
+                return bitmap;
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            }
+        } catch (Exception e) {
+            Log.w("ImageDownloader", "Error while retrieving bitmap from " + urls);
+            Log.w("ImageDownloader", "Error while retrieving bitmap: " + e.toString());
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
+     * Modified to use HttpUrlConnection instead og AndroidHttpClient
+     * @param urls
+     * @return
+     */
+    static BitmapFactory.Options downloadBitmapOptions(String urls) {
+
+
+        //final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+        //final HttpGet getRequest = new HttpGet(url);
+        URL url = null;
+        HttpURLConnection connection = null;
+
+        try {
+            url = new URL(urls);
+            connection = (HttpURLConnection) url.openConnection();
+            int z = connection.getResponseCode();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                Log.e("ImageDownloader", "Error while retrieving bitmap: " + connection.getResponseMessage());
+                return null;
+            }
+            InputStream inputStream = null;
+            try {
+                inputStream = new BufferedInputStream(connection.getInputStream());
+
+                // First decode with inJustDecodeBounds=true to check dimensions
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(inputStream, null, options);
+                return options;
+            } finally {
+                if (inputStream != null)
+                    inputStream.close();
+                if (connection != null)
+                    connection.disconnect();
+            }
+        } catch (Exception e) {
+            Log.e("ImageDownloader", "Error while retrieving bitmap options from " + urls);
+            Log.e("ImageDownloader", "Error while retrieving bitmap options: " + e.toString());
+        } finally {
+            if (connection != null)
+                connection.disconnect();
+        }
+        return null;
     }
 
 

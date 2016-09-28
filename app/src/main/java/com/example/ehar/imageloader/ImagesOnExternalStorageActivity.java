@@ -52,10 +52,10 @@ import java.util.ArrayList;
 public class ImagesOnExternalStorageActivity extends Activity {
 
     public static final int EXT_STORAGE_READ_REQUEST = 999;
+    public static final int INTERNET_REQUEST = 998;
 
     boolean sd_card_read_permission = false;
     BitmapFactory.Options bmOptions = null;
-    String sdPath = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +83,15 @@ public class ImagesOnExternalStorageActivity extends Activity {
     }
 
     public void handle_permissions() {
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String []
-                    {Manifest.permission.READ_EXTERNAL_STORAGE}, EXT_STORAGE_READ_REQUEST);
+        if ((checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
+             || (checkSelfPermission(Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED))
+        {
+            ActivityCompat.requestPermissions(this,
+                    new String [] {Manifest.permission.READ_EXTERNAL_STORAGE,
+                                   Manifest.permission.INTERNET},
+                    EXT_STORAGE_READ_REQUEST);
             return;
         }
         else {
@@ -106,7 +111,7 @@ public class ImagesOnExternalStorageActivity extends Activity {
             }
             else {
                 sd_card_read_permission = false;
-                Log.e("PERM:", "Access to external storage denied");
+                Log.e("PERM:", "Access to external storage and internet denied");
                 Toast.makeText(this, R.string.NO_EXTRNL_STRG_TST_MSG, Toast.LENGTH_LONG);
             }
         }
@@ -142,7 +147,8 @@ public class ImagesOnExternalStorageActivity extends Activity {
                     new Thread(new Runnable() {
                         public void run() {
 
-                            final Bitmap bm = BitmapFactory.decodeFile(pics.get(tmp_i));
+                            //final Bitmap bm = BitmapFactory.decodeFile(pics.get(tmp_i));
+                            final Bitmap bm = Utility.downloadBitmap("http://csfile2/~ehar/images/moose.jpg");
 
                             // Why do we have to do this? Because we're not on the UI thread.
                             ib.post(new Runnable() {

@@ -25,7 +25,6 @@ public class LoadImageFromExternalStorageTask extends AsyncTask<String, Void, Bi
 
     @Override
     protected Bitmap doInBackground(String... paths) {
-        //return BitmapFactory.decodeFile(paths[0]);
         return Utility.decodeSampledBitmap(paths[0], w, h);
     }
 

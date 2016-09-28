@@ -23,7 +23,8 @@ public class LoadImagesFromNetwork extends Activity {
         //ArrayAdapter<String>  adapter = new ArrayAdapter<String>(this,
         //        R.layout.list_item, Images.imageUrls);
 
-        ImageListViewAdapter ilva = new ImageListViewAdapter(this, R.id.list_item, Images.imageUrls);
+        ImageListViewAdapter ilva =
+            new ImageListViewAdapter(this, R.id.list_item, Images.imageUrls);
 
         lv.setAdapter(ilva);
     }
