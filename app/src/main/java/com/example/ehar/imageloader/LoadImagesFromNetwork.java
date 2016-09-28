@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class LoadImagesFromNetwork extends Activity {
 
     private ListView lv = null;
@@ -16,9 +20,11 @@ public class LoadImagesFromNetwork extends Activity {
 
         lv = (ListView) findViewById(R.id.image_listview);
 
-        ArrayAdapter<String>  adapter = new ArrayAdapter<String>(this,
-                R.layout.list_item, Images.imageUrls);
+        //ArrayAdapter<String>  adapter = new ArrayAdapter<String>(this,
+        //        R.layout.list_item, Images.imageUrls);
 
-        lv.setAdapter(adapter);
+        ImageListViewAdapter ilva = new ImageListViewAdapter(this, R.id.list_item, Images.imageUrls);
+
+        lv.setAdapter(ilva);
     }
 }
