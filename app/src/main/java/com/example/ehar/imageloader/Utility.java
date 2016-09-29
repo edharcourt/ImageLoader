@@ -135,7 +135,7 @@ public class Utility {
      * @param urls
      * @return
      */
-    static Bitmap downloadBitmap(String urls) {
+    static Bitmap downloadBitmap(String urls, int w, int h) {
 
         // Get the dimentions of the the URL image
         BitmapFactory.Options options = downloadBitmapOptions(urls);
@@ -151,7 +151,6 @@ public class Utility {
         try {
             url = new URL(urls);
             connection = (HttpURLConnection) url.openConnection();
-            int z = connection.getResponseCode();
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 Log.w("ImageDownloader", "Error while retrieving bitmap: " + connection.getResponseMessage());
                 return null;
@@ -159,8 +158,7 @@ public class Utility {
             InputStream inputStream = null;
             try {
                 inputStream = new BufferedInputStream(connection.getInputStream());
-                //final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                final Bitmap bitmap = Utility.decodeSampledBitmap(inputStream, options, 120, 120);
+                final Bitmap bitmap = Utility.decodeSampledBitmap(inputStream, options, w, h);
                 return bitmap;
             } finally {
                 if (inputStream != null) {

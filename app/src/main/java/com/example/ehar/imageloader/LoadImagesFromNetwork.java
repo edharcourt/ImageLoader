@@ -1,6 +1,7 @@
 package com.example.ehar.imageloader;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;

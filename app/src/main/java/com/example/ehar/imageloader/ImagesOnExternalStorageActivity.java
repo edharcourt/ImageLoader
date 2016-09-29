@@ -142,13 +142,12 @@ public class ImagesOnExternalStorageActivity extends Activity {
             ib.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
                     // should we check that it might already be loaded?
-                    // Bitmap bm1 = decodeSampledBitmapFromResource(r,id,120,120);
                     new Thread(new Runnable() {
                         public void run() {
 
-                            //final Bitmap bm = BitmapFactory.decodeFile(pics.get(tmp_i));
-                            final Bitmap bm = Utility.downloadBitmap("http://csfile2/~ehar/images/moose.jpg");
+                            final Bitmap bm = Utility.decodeSampledBitmap(pics.get(tmp_i),120,120);
 
                             // Why do we have to do this? Because we're not on the UI thread.
                             ib.post(new Runnable() {
