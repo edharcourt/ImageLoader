@@ -1,18 +1,19 @@
 package com.example.ehar.imageloader;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.ref.WeakReference;
 
 /**
  * Created by ehar on 9/27/16.
@@ -21,10 +22,15 @@ import java.util.List;
 public class ImageListViewAdapter extends ArrayAdapter<String> {
 
     private String [] urls;
+    private Context ctx;
+    private Bitmap placeholder;
 
-    public ImageListViewAdapter(Context ctx, int resource, String [] urls) {
+    public ImageListViewAdapter(Context ctx, int resource, String [] urls,
+                                Bitmap placeholder) {
         super(ctx, resource, urls);
         this.urls = urls;
+        this.ctx = ctx;
+        this.placeholder = placeholder;
     }
 
     @Override
@@ -32,10 +38,15 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
         return urls.length;
     }
 
-
     @Override
     public String getItem(int i) {
         return urls[i];
+    }
+
+    @Override
+    public long getItemId(int position) {
+        //return super.getItemId(position);
+        return position;
     }
 
     //@Override
@@ -59,46 +70,130 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
             viewHolder = (ViewHolder) reusedView.getTag();
         }
 
-        // TextView url = (TextView) reusedView.findViewById(R.id.list_item_text);
-        // viewHolder.url.setText(getItem(i));
+        if (cancelPotentialWork(i, viewHolder.image)) {
+            final DownloadBitmapTask task = new DownloadBitmapTask(viewHolder, getItem(i), i);
+            final AsyncDrawable asyncDrawable =
+                    new AsyncDrawable(ctx.getResources(), placeholder, task);
 
-        // ImageView iv = (ImageView) reusedView.findViewById(R.id.list_item_image);
-
-        DownLoadBitmapTask task = new DownLoadBitmapTask(viewHolder, getItem(i));
-        task.execute(getItem(i));
+            viewHolder.image.setImageDrawable(asyncDrawable);
+            task.execute();
+        }
 
         return reusedView;
     }
 
-    class DownLoadBitmapTask extends AsyncTask<String, Void, Bitmap>{
+
+    /**
+     *
+     * @param data
+     * @param imageView
+     * @return
+     */
+    public static boolean cancelPotentialWork(int data, ImageView imageView) {
+        final DownloadBitmapTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
+
+        if (bitmapWorkerTask != null) {
+            final int bitmapData = bitmapWorkerTask.id;
+            // If bitmapData is not yet set or it differs from the new data
+            if (bitmapData == 0 || bitmapData != data) {
+                // Cancel previous task
+                bitmapWorkerTask.cancel(true);
+            } else {
+                // The same work is already in progress
+                return false;
+            }
+        }
+        // No task associated with the ImageView, or an existing task was cancelled
+        return true;
+    }
+
+    /**
+     *
+     * @param imageView
+     * @return
+     */
+    private static DownloadBitmapTask getBitmapWorkerTask(ImageView imageView) {
+        if (imageView != null) {
+            final Drawable drawable = imageView.getDrawable();
+            if (drawable instanceof AsyncDrawable) {
+                final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
+                return asyncDrawable.getBitmapWorkerTask();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Worker to download a bitmap impage over the network.
+     */
+    class DownloadBitmapTask extends AsyncTask<Void, Void, Bitmap>{
 
         ViewHolder viewHolder;
         int w, h;
         String url;
+        int id;
 
-        public DownLoadBitmapTask(ViewHolder viewHolder, String url) {
+        public DownloadBitmapTask(ViewHolder viewHolder, String url, int id) {
             this.viewHolder = viewHolder;
             this.w = viewHolder.image.getWidth();
             this.h = viewHolder.image.getHeight();
             this.url = url;
+            this.id = id;
         }
 
         @Override
-        protected Bitmap doInBackground(String... url) {
-            return Utility.downloadBitmap(url[0], w, h);
+        protected Bitmap doInBackground(Void... params) {
+            return Utility.downloadBitmap(url, w, h);
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            viewHolder.image.setImageBitmap(bitmap);
-            viewHolder.url.setText(url);
+            //super.onPostExecute(bitmap);
+            if (isCancelled())
+                bitmap = null;
+
+            if (viewHolder.image != null && bitmap != null) {
+                final ImageView imageView = viewHolder.image;
+                final DownloadBitmapTask bitmapWorkerTask =
+                        getBitmapWorkerTask(imageView);
+                if (this == bitmapWorkerTask && imageView != null) {
+                    imageView.setImageBitmap(bitmap);
+                    viewHolder.url.setText(url);
+                }
+            }
+            //viewHolder.image.setImageBitmap(bitmap);
+            //viewHolder.url.setText(url);
         }
     }
 
+    /**
+     * For use in the ViewHolder pattern.
+     *
+     * https://developer.android.com/training/improving-layouts/smooth-scrolling.html
+     *
+     */
     private static class ViewHolder {
         TextView url;
         ImageView image;
     }
+
+
+    /**
+     *
+     */
+    static class AsyncDrawable extends BitmapDrawable {
+        private final WeakReference<DownloadBitmapTask> bitmapWorkerTaskReference;
+
+        public AsyncDrawable(Resources res, Bitmap bitmap,
+                             DownloadBitmapTask bitmapWorkerTask) {
+            super(res, bitmap);
+            bitmapWorkerTaskReference = new WeakReference<>(bitmapWorkerTask);
+        }
+
+        public DownloadBitmapTask getBitmapWorkerTask() {
+            return bitmapWorkerTaskReference.get();
+        }
+    }
+
 
 }  // ImageListViewAdapter

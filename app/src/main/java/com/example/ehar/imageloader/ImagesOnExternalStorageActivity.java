@@ -187,7 +187,7 @@ public class ImagesOnExternalStorageActivity extends Activity {
             ib.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new LoadImageFromExternalStorageTask(ib, ib.getWidth(), ib.getHeight()).execute(pics.get(tmp_i));
+                    new LoadImageFromExternalStorageTask(ib).execute(pics.get(tmp_i));
                 }
             });
         }

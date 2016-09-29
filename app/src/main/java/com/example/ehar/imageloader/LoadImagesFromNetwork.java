@@ -2,6 +2,8 @@ package com.example.ehar.imageloader;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -24,8 +26,13 @@ public class LoadImagesFromNetwork extends Activity {
         //ArrayAdapter<String>  adapter = new ArrayAdapter<String>(this,
         //        R.layout.list_item, Images.imageUrls);
 
+
+        Bitmap bitmap =
+                BitmapFactory.decodeResource(getResources(), R.drawable.placeholder);
+
         ImageListViewAdapter ilva =
-            new ImageListViewAdapter(this, R.id.list_item, Images.imageUrls);
+            new ImageListViewAdapter(
+                    this, R.id.list_item, Images.imageUrls, bitmap);
 
         lv.setAdapter(ilva);
     }

@@ -17,10 +17,10 @@ public class LoadImageFromExternalStorageTask extends AsyncTask<String, Void, Bi
     ImageView v = null;  // Should we make this a WeakReference?
     int w, h;
 
-    public LoadImageFromExternalStorageTask(ImageView v, int w, int h) {
+    public LoadImageFromExternalStorageTask(ImageView v) {
         this.v = v;
-        this.w = w;
-        this.h = h;
+        this.w = v.getWidth();
+        this.h = v.getHeight();
     }
 
     @Override
