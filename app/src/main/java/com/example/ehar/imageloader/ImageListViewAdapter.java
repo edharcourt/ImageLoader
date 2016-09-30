@@ -135,8 +135,10 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
 
         public DownloadBitmapTask(ViewHolder viewHolder, String url, int id) {
             this.viewHolder = viewHolder;
-            this.w = viewHolder.image.getWidth();
-            this.h = viewHolder.image.getHeight();
+            //this.w = viewHolder.image.getWidth();
+            //this.h = viewHolder.image.getHeight();
+            this.w = 120;
+            this.h = 120;
             this.url = url;
             this.id = id;
         }
@@ -161,8 +163,6 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
                     viewHolder.url.setText(url);
                 }
             }
-            //viewHolder.image.setImageBitmap(bitmap);
-            //viewHolder.url.setText(url);
         }
     }
 
