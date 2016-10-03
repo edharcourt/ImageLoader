@@ -49,17 +49,13 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
         return position;
     }
 
-    //@Override
-    //public long getItemId(int i) {
-    //    return 0;
-    //}
-
     @Override
     public View getView(int i, View reusedView, ViewGroup parent) {
 
         ViewHolder viewHolder;
 
-        if (reusedView ==  null) {
+        // see if we are reusing a view
+        if (reusedView == null) {
             reusedView = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.url = (TextView) reusedView.findViewById(R.id.list_item_text);
@@ -70,6 +66,11 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
             viewHolder = (ViewHolder) reusedView.getTag();
         }
 
+        /*
+         * Start an AsyncTask to start downloading an image
+         * but you might need to first cancel one that is currently
+         * in progress for the same ImageView.
+         */
         if (cancelPotentialWork(i, viewHolder.image)) {
             final DownloadBitmapTask task = new DownloadBitmapTask(viewHolder, getItem(i), i);
             final AsyncDrawable asyncDrawable =

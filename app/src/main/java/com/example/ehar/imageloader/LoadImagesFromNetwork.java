@@ -27,9 +27,13 @@ public class LoadImagesFromNetwork extends Activity {
         //        R.layout.list_item, Images.imageUrls);
 
 
+        // This is the placeholder bitmap for use in the
+        // listview
         Bitmap bitmap =
-                BitmapFactory.decodeResource(getResources(), R.drawable.placeholder);
+                BitmapFactory.decodeResource(
+                        getResources(), R.drawable.placeholder);
 
+        // A custom ListView adapter
         ImageListViewAdapter ilva =
             new ImageListViewAdapter(
                     this, R.id.list_item, Images.imageUrls, bitmap);
