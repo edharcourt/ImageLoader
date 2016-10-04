@@ -137,25 +137,26 @@ public class Utility {
      */
     static Bitmap downloadBitmap(String urls, int w, int h) {
 
-        // Get the dimentions of the the URL image
+        // Get the dimensions of the the URL image
         BitmapFactory.Options options = downloadBitmapOptions(urls);
 
         if (options == null)
             return null;
 
-        //final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-        //final HttpGet getRequest = new HttpGet(url);
-        URL url = null;
+        URL url;
         HttpURLConnection connection = null;
 
         try {
             url = new URL(urls);
             connection = (HttpURLConnection) url.openConnection();
+
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 Log.w("ImageDownloader", "Error while retrieving bitmap: " + connection.getResponseMessage());
                 return null;
             }
+
             InputStream inputStream = null;
+
             try {
                 inputStream = new BufferedInputStream(connection.getInputStream());
                 final Bitmap bitmap = Utility.decodeSampledBitmap(inputStream, options, w, h);
@@ -184,21 +185,20 @@ public class Utility {
      */
     static BitmapFactory.Options downloadBitmapOptions(String urls) {
 
-
-        //final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-        //final HttpGet getRequest = new HttpGet(url);
         URL url = null;
         HttpURLConnection connection = null;
 
         try {
             url = new URL(urls);
             connection = (HttpURLConnection) url.openConnection();
-            int z = connection.getResponseCode();
+
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 Log.e("ImageDownloader", "Error while retrieving bitmap: " + connection.getResponseMessage());
                 return null;
             }
+
             InputStream inputStream = null;
+
             try {
                 inputStream = new BufferedInputStream(connection.getInputStream());
 
@@ -222,6 +222,4 @@ public class Utility {
         }
         return null;
     }
-
-
 } // Utility

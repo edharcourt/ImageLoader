@@ -17,6 +17,13 @@ import java.lang.ref.WeakReference;
 
 /**
  * Created by ehar on 9/27/16.
+ *
+ * https://developer.android.com/training/displaying-bitmaps/process-bitmap.html
+ *
+ * which is based off the blog post at ...
+ *
+ * http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
+ *
  */
 
 public class ImageListViewAdapter extends ArrayAdapter<String> {
@@ -25,9 +32,12 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
     private Context ctx;
     private Bitmap placeholder;
 
-    public ImageListViewAdapter(Context ctx, int resource, String [] urls,
-                                Bitmap placeholder) {
+    public ImageListViewAdapter(
+            Context ctx, int resource,
+            String [] urls, Bitmap placeholder) {
+
         super(ctx, resource, urls);
+
         this.urls = urls;
         this.ctx = ctx;
         this.placeholder = placeholder;
@@ -71,7 +81,7 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
          * but you might need to first cancel one that is currently
          * in progress for the same ImageView.
          */
-        if (cancelPotentialWork(i, viewHolder.image)) {
+          if (cancelPotentialWork(getItem(i), viewHolder.image)) {
             final DownloadBitmapTask task = new DownloadBitmapTask(viewHolder, getItem(i), i);
             final AsyncDrawable asyncDrawable =
                     new AsyncDrawable(ctx.getResources(), placeholder, task);
@@ -85,30 +95,35 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
 
 
     /**
+     * Cancel a task for an image view since a new one is about to start.
      *
-     * @param data
+     * @param url
      * @param imageView
-     * @return
+     * @return returns true most of the time but occasionally false
+     *         when the same work is already scheduled
      */
-    public static boolean cancelPotentialWork(int data, ImageView imageView) {
+    public static boolean cancelPotentialWork(String url, ImageView imageView) {
         final DownloadBitmapTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
 
         if (bitmapWorkerTask != null) {
-            final int bitmapData = bitmapWorkerTask.id;
-            // If bitmapData is not yet set or it differs from the new data
-            if (bitmapData == 0 || bitmapData != data) {
-                // Cancel previous task
-                bitmapWorkerTask.cancel(true);
+            final String bitmapUrl = bitmapWorkerTask.url;
+
+            // If bitmapUrl is not yet set or it differs from the new url
+            if (bitmapUrl == null || (!bitmapUrl.equals(url))) {
+                bitmapWorkerTask.cancel(true); // Cancel previous task
             } else {
-                // The same work is already in progress
-                return false;
+                return false; // The same work is already in progress
             }
         }
+
         // No task associated with the ImageView, or an existing task was cancelled
         return true;
     }
 
     /**
+     *
+     * Get the reference to the bitmap task from an ImageView but
+     * only if it contains an AsyncDrawable.
      *
      * @param imageView
      * @return
@@ -180,6 +195,12 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
 
 
     /**
+     * This AsyncDrawable serves two purposes:
+     *
+     * 1) It contains a link back to the AsyncTask that is supposed to load it.
+     *
+     * 2) It contains a placeholder image to show while the real image is being
+     *    downloaded.
      *
      */
     static class AsyncDrawable extends BitmapDrawable {
