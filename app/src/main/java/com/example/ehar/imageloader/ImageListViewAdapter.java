@@ -55,7 +55,6 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
 
     @Override
     public long getItemId(int position) {
-        //return super.getItemId(position);
         return position;
     }
 
@@ -81,7 +80,7 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
          * but you might need to first cancel one that is currently
          * in progress for the same ImageView.
          */
-          if (cancelPotentialWork(getItem(i), viewHolder.image)) {
+        if (cancelPotentialWork(getItem(i), viewHolder.image)) {
             final DownloadBitmapTask task = new DownloadBitmapTask(viewHolder, getItem(i), i);
             final AsyncDrawable asyncDrawable =
                     new AsyncDrawable(ctx.getResources(), placeholder, task);
@@ -97,12 +96,14 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
     /**
      * Cancel a task for an image view since a new one is about to start.
      *
-     * @param url
-     * @param imageView
+     * @param url - the url of the image we need to download
+     * @param imageView - the ImageView that is coming in to view
      * @return returns true most of the time but occasionally false
      *         when the same work is already scheduled
      */
     public static boolean cancelPotentialWork(String url, ImageView imageView) {
+
+        // get the task for the imageview, if it exists
         final DownloadBitmapTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
 
         if (bitmapWorkerTask != null) {
@@ -116,7 +117,8 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
             }
         }
 
-        // No task associated with the ImageView, or an existing task was cancelled
+        // No task associated with the ImageView,
+        // or an existing task was cancelled
         return true;
     }
 
@@ -166,10 +168,12 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            //super.onPostExecute(bitmap);
+
             if (isCancelled())
                 bitmap = null;
 
+            // We only display the image if the current task
+            // is the one that was fired off to start with
             if (viewHolder.image != null && bitmap != null) {
                 final ImageView imageView = viewHolder.image;
                 final DownloadBitmapTask bitmapWorkerTask =
@@ -216,6 +220,5 @@ public class ImageListViewAdapter extends ArrayAdapter<String> {
             return bitmapWorkerTaskReference.get();
         }
     }
-
 
 }  // ImageListViewAdapter
